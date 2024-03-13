@@ -1,63 +1,42 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import Stack from '@mui/material/Stack';
-import Container from '@mui/material/Container';
-import Grid from '@mui/material/Unstable_Grid2';
-import Typography from '@mui/material/Typography';
-
-import { products } from 'src/_mock/products';
-
-import ProductCard from '../product-card';
-import ProductSort from '../product-sort';
-import ProductFilters from '../product-filters';
-import ProductCartWidget from '../product-cart-widget';
-
-// ----------------------------------------------------------------------
+import { Container, Typography } from '@mui/material';
+import { DashboardApi } from 'src/api/dashboard.ts';
+import TableComponent from '../table';
 
 export default function ProductsView() {
-  const [openFilter, setOpenFilter] = useState(false);
+  const [data, setData] = useState([]);
 
-  const handleOpenFilter = () => {
-    setOpenFilter(true);
-  };
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      new DashboardApi().getAllBooking().then((value) => {
+        const transformedData = value.map((item) => ({
+          name: item.name,
+          ticketNumber: item.ticket,
+          status: item.paymentStatus,
+          departureDate: new Date(item.departure).toISOString().split('T')[0],
+          arrivalDate: new Date(item.arrival).toISOString().split('T')[0],
+          ticketStatus: item.ticketStatus,
+        }));
 
-  const handleCloseFilter = () => {
-    setOpenFilter(false);
-  };
+        console.log(transformedData);
+
+        setData(transformedData);
+      });
+    };
+
+    fetchDashboardData();
+  }, []);
 
   return (
-    <Container>
-      <Typography variant="h4" sx={{ mb: 5 }}>
-        Products
-      </Typography>
-
-      <Stack
-        direction="row"
-        alignItems="center"
-        flexWrap="wrap-reverse"
-        justifyContent="flex-end"
-        sx={{ mb: 5 }}
-      >
-        <Stack direction="row" spacing={1} flexShrink={0} sx={{ my: 1 }}>
-          <ProductFilters
-            openFilter={openFilter}
-            onOpenFilter={handleOpenFilter}
-            onCloseFilter={handleCloseFilter}
-          />
-
-          <ProductSort />
-        </Stack>
-      </Stack>
-
-      <Grid container spacing={3}>
-        {products.map((product) => (
-          <Grid key={product.id} xs={12} sm={6} md={3}>
-            <ProductCard product={product} />
-          </Grid>
-        ))}
-      </Grid>
-
-      <ProductCartWidget />
+    <Container maxWidth="xl">
+      <Container maxWidth="xl">
+        <Typography variant="h4" sx={{ mb: 5 }}>
+          Reports
+        </Typography>
+      </Container>
+      <br />
+      <TableComponent data={data} />
     </Container>
   );
 }

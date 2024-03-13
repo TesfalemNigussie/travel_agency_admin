@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 import Box from '@mui/material/Box';
@@ -6,8 +6,7 @@ import Box from '@mui/material/Box';
 import Nav from './nav';
 import Main from './main';
 import Header from './header';
-
-// ----------------------------------------------------------------------
+import { DashboardApi } from 'src/api/dashboard';
 
 export default function DashboardLayout({ children }) {
   const [openNav, setOpenNav] = useState(false);

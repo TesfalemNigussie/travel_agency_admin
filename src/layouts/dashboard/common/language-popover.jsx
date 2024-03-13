@@ -40,7 +40,7 @@ export default function LanguagePopover() {
 
   return (
     <>
-      <IconButton
+      {/* <IconButton
         onClick={handleOpen}
         sx={{
           width: 40,
@@ -80,7 +80,7 @@ export default function LanguagePopover() {
             {option.label}
           </MenuItem>
         ))}
-      </Popover>
+      </Popover> */}
     </>
   );
 }

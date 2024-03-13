@@ -1,5 +1,6 @@
 {
   "root": true,
+   "parser": "@typescript-eslint/parser",
   "env": {
     "browser": true,
     "es2021": true
@@ -7,7 +8,7 @@
   "plugins": [
     "perfectionist",
     "unused-imports",
-    "prettier"
+    "prettier",
   ],
   "extends": [
     "airbnb",
@@ -35,6 +36,7 @@
         ],
         "extensions": [
           ".js",
+          ".ts",
           ".jsx",
           ".json"
         ]

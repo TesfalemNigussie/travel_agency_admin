@@ -1,6 +1,14 @@
 import { useState } from 'react';
 
 import Card from '@mui/material/Card';
+import Modal from '@mui/material/Modal';
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
+
 import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
 import Button from '@mui/material/Button';
@@ -9,8 +17,6 @@ import TableBody from '@mui/material/TableBody';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
-
-import { users } from 'src/_mock/user';
 
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
@@ -22,9 +28,9 @@ import TableEmptyRows from '../table-empty-rows';
 import UserTableToolbar from '../user-table-toolbar';
 import { emptyRows, applyFilter, getComparator } from '../utils';
 
-// ----------------------------------------------------------------------
+export default function UserPage(props) {
+  let { buttonText, onAddNew, users, title, onStatusChange, onDelete } = props;
 
-export default function UserPage() {
   const [page, setPage] = useState(0);
 
   const [order, setOrder] = useState('asc');
@@ -72,6 +78,24 @@ export default function UserPage() {
     setSelected(newSelected);
   };
 
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const handleSave = () => {
+    setModalOpen(false);
+    onAddNew({ name, emailAddress, password });
+  };
+
+  const handlePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const handleModalClose = (event) => {
+    setModalOpen(event.currentTarget);
+  };
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -97,10 +121,15 @@ export default function UserPage() {
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Users</Typography>
+        <Typography variant="h4">{title}</Typography>
 
-        <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />}>
-          New User
+        <Button
+          variant="contained"
+          color="inherit"
+          onClick={() => setModalOpen(true)}
+          startIcon={<Iconify icon="eva:plus-fill" />}
+        >
+          {buttonText || 'New User'}
         </Button>
       </Stack>
 
@@ -123,9 +152,8 @@ export default function UserPage() {
                 onSelectAllClick={handleSelectAllClick}
                 headLabel={[
                   { id: 'name', label: 'Name' },
-                  { id: 'company', label: 'Company' },
+                  { id: 'email', label: 'Email' },
                   { id: 'role', label: 'Role' },
-                  { id: 'isVerified', label: 'Verified', align: 'center' },
                   { id: 'status', label: 'Status' },
                   { id: '' },
                 ]}
@@ -133,17 +161,20 @@ export default function UserPage() {
               <TableBody>
                 {dataFiltered
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => (
+                  .map((row, index) => (
                     <UserTableRow
-                      key={row.id}
-                      name={row.name}
-                      role={row.role}
-                      status={row.status}
-                      company={row.company}
-                      avatarUrl={row.avatarUrl}
-                      isVerified={row.isVerified}
-                      selected={selected.indexOf(row.name) !== -1}
-                      handleClick={(event) => handleClick(event, row.name)}
+                      id={row?._id}
+                      key={index}
+                      name={row?.name ?? ''}
+                      emailAddress={row?.emailAddress ?? ''}
+                      role={row?.type ?? ''}
+                      status={row?.status ?? ''}
+                      avatarUrl="https://st4.depositphotos.com/3538103/40645/v/450/depositphotos_406455892-stock-illustration-user-icon-vector-people-icon.jpg"
+                      isActive={row?.isActive ?? ''}
+                      selected={selected.indexOf(row?.name) !== -1}
+                      handleClick={(event) => handleClick(event, row?.name)}
+                      handleChangeStatus={onStatusChange}
+                      onDelete={onDelete}
                     />
                   ))}
 
@@ -167,6 +198,64 @@ export default function UserPage() {
           rowsPerPageOptions={[5, 10, 25]}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
+
+        <Modal open={modalOpen} onClose={handleModalClose}>
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              bgcolor: 'background.paper',
+              boxShadow: 24,
+              p: 4,
+              maxWidth: 400,
+              width: '100%',
+              outline: 'none',
+              borderRadius: '8px',
+            }}
+          >
+            <h2>Add User</h2>
+            <TextField
+              label="Name"
+              fullWidth
+              variant="outlined"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              label="Email Address"
+              fullWidth
+              variant="outlined"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              sx={{ mb: 2 }}
+            />
+            <FormControl fullWidth variant="outlined" sx={{ mb: 2 }}>
+              <InputLabel>Password</InputLabel>
+              <TextField
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton onClick={handlePasswordVisibility}>
+                      {showPassword ? (
+                        <Iconify icon="eva:eye-outline" />
+                      ) : (
+                        <Iconify icon="eva:eye-off-2-outline" />
+                      )}
+                    </IconButton>
+                  </InputAdornment>
+                }
+              />
+            </FormControl>
+            <Button variant="contained" onClick={handleSave} sx={{ mt: 2 }}>
+              Save
+            </Button>
+          </Box>
+        </Modal>
       </Card>
     </Container>
   );

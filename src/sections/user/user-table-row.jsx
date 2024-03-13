@@ -14,17 +14,17 @@ import IconButton from '@mui/material/IconButton';
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
 
-// ----------------------------------------------------------------------
-
 export default function UserTableRow({
+  id,
   selected,
   name,
   avatarUrl,
-  company,
+  emailAddress,
   role,
-  isVerified,
+  isActive,
   status,
   handleClick,
+  handleChangeStatus,
 }) {
   const [open, setOpen] = useState(null);
 
@@ -40,7 +40,7 @@ export default function UserTableRow({
     <>
       <TableRow hover tabIndex={-1} role="checkbox" selected={selected}>
         <TableCell padding="checkbox">
-          <Checkbox disableRipple checked={selected} onChange={handleClick} />
+          {/* <Checkbox disableRipple checked={selected} onChange={handleClick} /> */}
         </TableCell>
 
         <TableCell component="th" scope="row" padding="none">
@@ -52,17 +52,27 @@ export default function UserTableRow({
           </Stack>
         </TableCell>
 
-        <TableCell>{company}</TableCell>
+        <TableCell>{emailAddress}</TableCell>
 
         <TableCell>{role}</TableCell>
 
-        <TableCell align="center">{isVerified ? 'Yes' : 'No'}</TableCell>
-
         <TableCell>
-          <Label color={(status === 'banned' && 'error') || 'success'}>{status}</Label>
+          <Label color={isActive === false ? 'error' : 'success'}>
+            {isActive ? 'Active' : 'Disabled'}
+          </Label>
         </TableCell>
 
         <TableCell align="right">
+          {isActive && (
+            <IconButton onClick={() => handleChangeStatus(id)}>
+              <Iconify icon="eva:eye-outline" />
+            </IconButton>
+          )}
+          {!isActive && (
+            <IconButton onClick={() => handleChangeStatus(id)}>
+              <Iconify icon="eva:eye-off-2-outline" />
+            </IconButton>
+          )}
           <IconButton onClick={handleOpenMenu}>
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>
@@ -84,7 +94,13 @@ export default function UserTableRow({
           Edit
         </MenuItem>
 
-        <MenuItem onClick={handleCloseMenu} sx={{ color: 'error.main' }}>
+        <MenuItem
+          onClick={() => {
+            onDelete(id);
+            handleCloseMenu();
+          }}
+          sx={{ color: 'error.main' }}
+        >
           <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
           Delete
         </MenuItem>

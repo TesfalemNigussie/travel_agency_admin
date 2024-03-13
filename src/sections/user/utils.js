@@ -48,8 +48,13 @@ export function applyFilter({ inputData, comparator, filterName }) {
 
   if (filterName) {
     inputData = inputData.filter(
-      (user) => user.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
+      (user) =>
+        (user.name && user.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1) ||
+        (user.emailAddress &&
+          user.emailAddress.toLowerCase().indexOf(filterName.toLowerCase()) !== -1)
     );
+
+    console.log('filterName', inputData);
   }
 
   return inputData;

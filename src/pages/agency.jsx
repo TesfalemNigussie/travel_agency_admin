@@ -4,7 +4,7 @@ import { UserView } from 'src/sections/user/view';
 import { AdminApi } from 'src/api/admin';
 import { ApiStatus } from 'src/api/operational.result';
 
-export default function UserPage() {
+export default function AgencyPage() {
   const [agents, setAgents] = useState([]);
 
   const onStatusChange = (id) => {
